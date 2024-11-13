@@ -72,7 +72,7 @@ const fieldsLabels = computed(() => {
       <div v-if="!isSuccessful " class="flex flex-col gap-3">
         <div class="flex items-center justify-center gap-4">
           <img :src="`${baseURL}/${type.image}`" class="h-15 w-15 border rounded-full object-cover" alt="" srcset="">
-          <div>
+          <div v-if="type.numbers.length > 0">
             <p class="text-sm text-#7B839E">
               رقم التحويل
             </p>
@@ -84,11 +84,19 @@ const fieldsLabels = computed(() => {
               <i class="i-carbon-copy text-xl text-primary" />
             </div>
           </div>
+          <div v-else>
+            <p class="text-sm text-#7B839E">
+              شحن الرصيد من خلال
+            </p>
+
+            <div class="flex gap-3">
+              <h1 dir="ltr" class="text-xl font-bold">
+                {{ type.name }}
+              </h1>
+            </div>
+          </div>
         </div>
-        <AppInput
-          v-model="body.amount" label="المبلغ"
-          note="*الحد الأدني (10,000 د.ع) و الحد الأقصى (1,000,000 د.ع)"
-        />
+        <AppInput v-model="body.amount" label="المبلغ" note="*الحد الأدني (10,000 د.ع) و الحد الأقصى (1,000,000 د.ع)" />
         <AppInput v-model="body.phoneNumber" :label="fieldsLabels.name" />
         <AppInput v-model="body.fullName" :label="fieldsLabels.phone" />
         <AppFileInput v-model="body.image" type="file" :label="fieldsLabels.image" />
