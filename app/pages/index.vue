@@ -2,6 +2,7 @@
 import ContactUs from '~/components/home/ContactUs.vue'
 import type { PaymentType } from '~/components/home/pay/types'
 import { baseURL } from '~/constants'
+import axiosInstance from '~/service/axios'
 
 const isDialogOpen = ref(false)
 const dialogType = ref<PaymentType | null>(null)
@@ -9,7 +10,7 @@ function openDialog(type: PaymentType) {
   dialogType.value = type
   isDialogOpen.value = true
 }
-const { data, status } = await useFetch<{ data: PaymentType[] }>(`${baseURL}/api/payment-types?isActive=true`)
+const { data } = await axiosInstance.get<{ data: PaymentType[] }>(`${baseURL}/api/payment-types?isActive=true`)
 </script>
 
 <template>
@@ -20,7 +21,7 @@ const { data, status } = await useFetch<{ data: PaymentType[] }>(`${baseURL}/api
         <h1 class="text-3xl font-bold">
           يمكنك شحن رصيدك من خلال
         </h1>
-        <div v-if="status === 'success'" class="grid gap-5 md:grid-cols-2">
+        <div class="grid gap-5 md:grid-cols-2">
           <HomeMethodCard v-for="paymentType in data!.data" :key="paymentType.id" :title="paymentType.name" :image="`${baseURL}/${paymentType.image}`" @click="openDialog(paymentType)" />
         </div>
       </div>
