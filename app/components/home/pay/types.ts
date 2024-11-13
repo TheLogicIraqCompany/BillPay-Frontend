@@ -1,29 +1,26 @@
-/* {
-  "amount": 0,
-  "fibName": "string",
-  "fibPhoneNumber": "string",
-  "image": "string",
-  "zainCashName": "string",
-  "zainCashPhoneNumber": "string",
-  "cardNumber": "string"
-}
-*/
 export interface DepositRequest {
   amount: number
-  fibName: string
-  fibPhoneNumber: string
-  image: string
-  zainCashName: string
-  zainCashPhoneNumber: string
+  fullName: string
+  phoneNumber: string
   cardNumber: string
+  paymentTypeId: string
+  image: string
 }
-export type DialogType = 'fib' | 'asiacell' | 'zain' | 'zaincash'
 export const depositBodyInit: DepositRequest = {
   amount: 0,
-  fibName: '',
-  fibPhoneNumber: '',
-  image: 'test',
-  zainCashName: '',
-  zainCashPhoneNumber: '',
+  fullName: '',
+  phoneNumber: '',
   cardNumber: '',
+  paymentTypeId: '',
+  image: '',
+}
+export interface PaymentType {
+  name: string
+  isActive: boolean
+  numbers: string[]
+  description: string
+  image: string
+  id: string
+  deleted: boolean
+  creationDate: string
 }

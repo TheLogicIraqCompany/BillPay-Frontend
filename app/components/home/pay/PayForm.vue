@@ -1,30 +1,14 @@
 <script lang="ts" setup>
+import { baseURL } from '~/constants'
 import axiosInstance from '~/service/axios'
-import AsiaCellDialog from './AsiaCellDialog.vue'
-import FIBDialog from './FIBDialog.vue'
-import { depositBodyInit, type DepositRequest, type DialogType } from './types'
-import ZainCashDialog from './ZainCashDialog.vue'
-import ZainDialog from './ZainDialog.vue'
+import { depositBodyInit, type DepositRequest, type PaymentType } from './types'
 
 const props = defineProps<{
-  type: DialogType
+  type: PaymentType
 }>()
 const isDialogOpen = defineModel<boolean>({
   default: false,
 })
-
-function currentForm() {
-  switch (props.type) {
-    case 'fib':
-      return FIBDialog
-    case 'asiacell':
-      return AsiaCellDialog
-    case 'zain':
-      return ZainDialog
-    case 'zaincash':
-      return ZainCashDialog
-  }
-}
 const body = ref<DepositRequest>({
   ...depositBodyInit,
 })
@@ -44,9 +28,20 @@ async function submit() {
     isError.value = true
     return
   }
+  // if (!body.value.image) {
+  //   isError.value = true
+  //   return
+  // }
   try {
     isError.value = false
     isLoading.value = true
+    body.value.paymentTypeId = props.type.id
+    const formData = new FormData()
+    formData.append('File', body.value.image)
+    const fileRes = await axiosInstance.post('/file', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    body.value.image = fileRes.data
     await axiosInstance.post('/deposit', body.value)
     isSuccessful.value = true
   }
@@ -60,13 +55,43 @@ async function submit() {
 }
 
 watch(() => isDialogOpen.value, resetBody)
+const randomFromArr = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)]
+
+const fieldsLabels = computed(() => {
+  return {
+    name: props.type.numbers.length > 0 ? `اسمك في ${props.type.name}` : 'اسمك الكامل',
+    phone: props.type.numbers.length > 0 ? `رقمك في ${props.type.name}` : 'رقم الهاتف',
+    image: props.type.numbers.length === 0 ? `صورة البطاقة` : 'صورة عملية التحويل',
+  }
+})
 </script>
 
 <template>
   <AppDialog v-model:model-value="isDialogOpen">
     <Transition name="fade">
       <div v-if="!isSuccessful " class="flex flex-col gap-3">
-        <component :is="currentForm()" v-model="body" />
+        <div class="flex items-center justify-center gap-4">
+          <img :src="`${baseURL}/${type.image}`" class="h-15 w-15 border rounded-full object-cover" alt="" srcset="">
+          <div>
+            <p class="text-sm text-#7B839E">
+              رقم التحويل
+            </p>
+
+            <div class="flex gap-3">
+              <h1 dir="ltr" class="text-xl font-bold">
+                {{ randomFromArr(type.numbers) }}
+              </h1>
+              <i class="i-carbon-copy text-xl text-primary" />
+            </div>
+          </div>
+        </div>
+        <AppInput
+          v-model="body.amount" label="المبلغ"
+          note="*الحد الأدني (10,000 د.ع) و الحد الأقصى (1,000,000 د.ع)"
+        />
+        <AppInput v-model="body.phoneNumber" :label="fieldsLabels.name" />
+        <AppInput v-model="body.fullName" :label="fieldsLabels.phone" />
+        <AppFileInput v-model="body.image" type="file" :label="fieldsLabels.image" />
         <div>
           <p v-if="isError" class="mb-1 text-sm text-danger">
             يرجى التأكد من ادخال المعلومات بشكل صحيح
