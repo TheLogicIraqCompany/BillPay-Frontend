@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ContactUs from '~/components/home/ContactUs.vue'
 import type { DialogType } from '~/components/home/pay/types'
+import { baseURL } from '~/constants'
 
 const isDialogOpen = ref(false)
 const dialogType = ref<DialogType>('asiacell')
@@ -8,6 +9,7 @@ function openDialog(type: DialogType) {
   dialogType.value = type
   isDialogOpen.value = true
 }
+const { data, status } = await useFetch<{ data: any[] }>(`${baseURL}/api/payment-types?isActive=true`)
 </script>
 
 <template>
@@ -18,11 +20,8 @@ function openDialog(type: DialogType) {
         <h1 class="text-3xl font-bold">
           يمكنك شحن رصيدك من خلال
         </h1>
-        <div class="grid gap-5 md:grid-cols-2">
-          <HomeMethodCard title="زين كاش" image="/payments/zaincash.png" @click="openDialog('zaincash')" />
-          <HomeMethodCard title="مصرف العراق الأول FIB" image="/payments/fib.png" @click="openDialog('fib')" />
-          <HomeMethodCard title="رصيد اسيا" image="/payments/asiacell.png" @click="openDialog('asiacell')" />
-          <HomeMethodCard title="رصيد زين" image="/payments/zain.png" @click="openDialog('zain')" />
+        <div v-if="status === 'success'" class="grid gap-5 md:grid-cols-2">
+          <HomeMethodCard v-for="paymentType in data.data" :key="paymentType.id" :title="paymentType.name" :image="`${baseURL}/${paymentType.image}`" @click="openDialog('zaincash')" />
         </div>
       </div>
 
