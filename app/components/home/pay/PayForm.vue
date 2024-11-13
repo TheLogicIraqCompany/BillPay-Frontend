@@ -97,8 +97,10 @@ const fieldsLabels = computed(() => {
           </div>
         </div>
         <AppInput v-model="body.amount" label="المبلغ" note="*الحد الأدني (10,000 د.ع) و الحد الأقصى (1,000,000 د.ع)" />
-        <AppInput v-model="body.phoneNumber" :label="fieldsLabels.name" />
-        <AppInput v-model="body.fullName" :label="fieldsLabels.phone" />
+        <AppInput v-if="type.numbers.length > 0" v-model="body.phoneNumber" :label="fieldsLabels.phone" />
+        <AppInput v-if="type.numbers.length === 0" v-model="body.cardNumber" label="رقم البطاقة" />
+
+        <AppInput v-model="body.fullName" :label="fieldsLabels.name" />
         <AppFileInput v-model="body.image" type="file" :label="fieldsLabels.image" />
         <div>
           <p v-if="isError" class="mb-1 text-sm text-danger">
