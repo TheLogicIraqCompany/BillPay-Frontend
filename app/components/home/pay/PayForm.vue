@@ -29,14 +29,16 @@ const body = ref<DepositRequest>({
   ...depositBodyInit,
 })
 
-watch(() => isDialogOpen.value, () => {
-  body.value = {
-    ...depositBodyInit,
-  }
-})
 const isError = ref(false)
 const isLoading = ref(false)
 const isSuccessful = ref(false)
+
+function resetBody() {
+  body.value = {
+    ...depositBodyInit,
+  }
+  isSuccessful.value = false
+}
 async function submit() {
   if (body.value.amount < 10000 || body.value.amount > 1000000) {
     isError.value = true
@@ -56,6 +58,8 @@ async function submit() {
     isLoading.value = false
   }
 }
+
+watch(() => isDialogOpen.value, resetBody)
 </script>
 
 <template>
@@ -88,7 +92,7 @@ async function submit() {
         <p class="text-center text-sm">
           سيتم التواصل معكم في اقرب وقت ممكن
         </p>
-        <button class="primary-btn mt-20 w-full py-3 btn hover:bg-op-10" @click="isSuccessful = false">
+        <button class="primary-btn mt-20 w-full py-3 btn hover:bg-op-10" @click="resetBody()">
           ارسال طلب جديد
         </button>
       </div>

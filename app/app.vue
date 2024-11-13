@@ -5,7 +5,11 @@ useHead({
   title: appName,
 })
 onMounted(() => {
-  localStorage.setItem('nuxt-color-mode', 'dark')
+  const color = localStorage.getItem('nuxt-color-mode')
+  if (!color || color != 'dark') {
+    localStorage.setItem('nuxt-color-mode', 'dark')
+    window.location.reload()
+  }
 })
 </script>
 
